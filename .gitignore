@@ -5,7 +5,7 @@
 __pycache__/
 
 # Environment files
-.env
+# .env
 
 # Compiled Python bytecode
 *.py[cod]
@@ -51,3 +51,6 @@ traefik-public-certificates
 
 # archivos temporales
 temp_files/
+
+# venv
+venv/

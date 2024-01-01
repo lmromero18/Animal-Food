@@ -19,11 +19,12 @@ depends_on = None
 # Create Warehouse Table
 def create_warehouse_table():
     op.create_table(
-        "Warehouse",
+        "warehouse",
         sa.Column("id", UUID, primary_key=True, default=uuid4()),
-        sa.Column("type", sa.String(50), nullable=False, unique=True),
-        sa.Column("number", sa.Integer),
-        sa.Column("name", sa.String, nullable=False, unique=True),
+        sa.Column("type", sa.String(50), nullable=False),
+        sa.Column("number", sa.Integer, autoincrement=True, nullable=True),
+        sa.Column("is_active", sa.Boolean, default=True),
+        sa.Column("name", sa.String, nullable=False, unique=True, index=True),
         sa.Column("created_by", UUID, nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("updated_by", UUID, nullable=True),
@@ -37,8 +38,14 @@ def create_warehouse_table():
         ).label("name")
     )
 
+    op.execute("CREATE SEQUENCE warehouse_number_seq")
+    op.execute("ALTER TABLE warehouse ALTER COLUMN number SET DEFAULT nextval('warehouse_number_seq')")
+    op.execute("ALTER TABLE warehouse ALTER COLUMN number SET NOT NULL")
+
 def upgrade() -> None:
     create_warehouse_table()    
 
 def downgrade() -> None:
-    op.drop_table("Warehouse")
+    op.execute("DROP SEQUENCE warehouse_number_seq")
+    op.drop_table("warehouse")
+

@@ -1,18 +1,23 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from shared.utils.schemas_base import BaseSchema, DateTimeModelMixin, IDModelMixin
 
-class WarehouseBaseSchema(BaseSchema):
+class WarehouseBase(BaseSchema):
     type: str | None 
     number: int | None
-    name: str | None
+    name: Optional[str]
 
-class WarehouseCreateSchema(WarehouseBaseSchema):
+class WarehouseCreate(WarehouseBase):
     type: str
-    number: int
-    name: str
+    number: Optional[int] = None
+    name: Optional[str] = None
 
-class WarehouseToSaveSchema(WarehouseCreateSchema, IDModelMixin, DateTimeModelMixin):
+class WarehouseToSave(WarehouseCreate):
     created_by: UUID | None
     updated_by: UUID | None
+
+class WarehouseInDB(WarehouseBase,IDModelMixin, DateTimeModelMixin):
+    created_by: UUID | None
+    updated_by: UUID | None
+    number: int | None

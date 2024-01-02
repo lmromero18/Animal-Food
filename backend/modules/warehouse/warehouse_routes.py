@@ -32,7 +32,7 @@ warehouse_router = APIRouter(
     name="warehouse:create-warehouse",
 )
 async def create_warehouse(
-    warehouse: WarehouseCreate = Body(..., embed=True),
+    warehouse: Optional[WarehouseCreate] = Body(..., embed=True),
     db: Database = Depends(get_database),
     current_user: UserInDB = Depends(get_current_active_user),
 ) -> ServiceResult:

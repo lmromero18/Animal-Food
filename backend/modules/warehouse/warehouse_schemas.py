@@ -14,7 +14,6 @@ class WarehouseToSave(WarehouseCreate):
     updated_by: UUID | None
 
 class WarehouseInDB(WarehouseBase,IDModelMixin, DateTimeModelMixin):
+    name: str | None
     created_by: UUID | None
     updated_by: UUID | None
-    name: str | None
-    number: str | None

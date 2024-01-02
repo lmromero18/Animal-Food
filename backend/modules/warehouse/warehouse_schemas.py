@@ -5,13 +5,9 @@ from shared.utils.schemas_base import BaseSchema, DateTimeModelMixin, IDModelMix
 
 class WarehouseBase(BaseSchema):
     type: str | None 
-    number: int | None
-    name: str | None
 
 class WarehouseCreate(WarehouseBase):
     type: str
-    number: Optional[int] = None
-    name: Optional[str] = None
 
 class WarehouseToSave(WarehouseCreate):
     created_by: UUID | None
@@ -20,3 +16,5 @@ class WarehouseToSave(WarehouseCreate):
 class WarehouseInDB(WarehouseBase,IDModelMixin, DateTimeModelMixin):
     created_by: UUID | None
     updated_by: UUID | None
+    name: str | None
+    number: str | None

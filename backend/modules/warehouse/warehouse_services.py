@@ -22,6 +22,7 @@ from modules.users.users.user_schemas import UserInDB
 from shared.core.config import API_PREFIX
 import shared.utils.repository_utils as ru
 from shared.utils.short_pagination import short_pagination
+
 class WarehouseService:
     def __init__(self, db: Database):
         self.db = db

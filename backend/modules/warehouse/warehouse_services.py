@@ -1,5 +1,6 @@
 from typing import List
 from uuid import UUID
+import uuid
 from shared.utils.record_to_dict import record_to_dict
 from shared.utils.verify_uuid import is_valid_uuid
 
@@ -30,7 +31,7 @@ class WarehouseService:
 
         new_warehouse = WarehouseToSave(**warehouse.dict())
         new_warehouse.created_by = current_user.id
-        new_warehouse.updated_by = current_user.id
+        new_warehouse.updated_by = uuid.UUID(int=0)
 
         warehouse_item = await WarehouseRepository(self.db).create_warehouse(new_warehouse)
 

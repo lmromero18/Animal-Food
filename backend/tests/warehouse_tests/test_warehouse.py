@@ -19,6 +19,6 @@ class TestWarehouseRoutes:
 class TestWarehouseCreate:
     async def test_create_warehouse_route(self, authorized_client: AsyncClient, app:FastAPI) -> None:
         client = await authorized_client
-        res = await client.post(app.url_path_for("warehouse:create-warehouse"), json={ "type": "test", "number": 1, "name": "test1"})
+        res = await client.post(app.url_path_for("warehouse:create-warehouse"), json={"warehouse": {"type": "test"}})
         assert res.status_code == status.HTTP_201_CREATED
     

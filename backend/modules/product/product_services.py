@@ -1,6 +1,8 @@
 from typing import List
 from uuid import UUID
 import uuid
+from modules.warehouse.warehouse_exceptions import WarehouseExceptions
+from modules.warehouse.warehouse_services import WarehouseService
 from shared.utils.record_to_dict import record_to_dict
 from shared.utils.verify_uuid import is_valid_uuid
 
@@ -25,7 +27,7 @@ from shared.utils.short_pagination import short_pagination
 class ProductService:
     def __init__(self, db: Database):
         self.db = db
-
+  
     async def create_product(
         self, product: ProductCreate, current_user: UserInDB):
 
@@ -70,7 +72,7 @@ class ProductService:
         product_in_db = await ProductRepository(self.db).get_product_by_id(id=id)
 
         if isinstance(product_in_db, dict) and not product_in_db.get("id"):
-            logger.info("The requested product is not in the database")
+            logger.info("El producto solicitado no está en base de datos")
             return ServiceResult(ProductExceptions.ProductNotFoundException())
 
         product = ProductInDB(**product_in_db.dict())
@@ -90,13 +92,13 @@ class ProductService:
             )
 
             if isinstance(product, dict) and not product.get("id"):
-                logger.info("The product ID to update is not in the database")
+                logger.info("El ID del producto a actualizar no está en base de datos")
                 return ServiceResult(ProductExceptions.ProductNotFoundException())
 
             return ServiceResult(ProductInDB(**product.dict()))
 
         except Exception as e:
-            logger.error(f"An error occurred: {e}")
+            logger.error(f"Error: {e}")
             return ServiceResult(ProductExceptions.ProductInvalidUpdateParamsException(e))
     
     async def delete_product_by_id(
@@ -106,7 +108,7 @@ class ProductService:
         product_id = await ProductRepository(self.db).delete_product_by_id(id=id)
 
         if isinstance(product_id, dict) and not product_id.get("id"):
-            logger.info("The product ID to delete is not in the database")
+            logger.info("El ID del producto a eliminar no está en base de datos")
             return ServiceResult(ProductExceptions.ProductNotFoundException())
         
         return ServiceResult(product_id)

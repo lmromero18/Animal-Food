@@ -5,7 +5,6 @@ from uuid import UUID
 
 from modules.warehouse.warehouse_exceptions import WarehouseExceptions
 from modules.warehouse.warehouse_schemas import (
-    WarehouseCreate,
     WarehouseInDB,
     WarehouseToSave,
     WarehouseUpdate

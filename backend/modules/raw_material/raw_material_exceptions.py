@@ -3,20 +3,20 @@ from typing import Any
 from shared.utils.app_exceptions import AppExceptionCase
 
 
-class ProductExceptions:
-    class ProductCreateException(AppExceptionCase):
+class RawMaterialExceptions:
+    class RawMaterialCreateException(AppExceptionCase):
         """_
-        Product creation failed
+        Raw material creation failed
         """
 
         def __init__(self, msg: str = ""):
             status_code = 500
-            msg = "Error creando el producto"
+            msg = "Error creando la materia prima"
             AppExceptionCase.__init__(self, status_code, msg)
 
-    class ProductNotFoundException(AppExceptionCase):
+    class RawMaterialNotFoundException(AppExceptionCase):
         """_
-        Product's ID not found
+        Raw material's ID not found
         """
 
         def __init__(self, msg: str = ""):
@@ -24,19 +24,19 @@ class ProductExceptions:
             msg = "El ID suministrado no se encuentra en la DB"
             AppExceptionCase.__init__(self, status_code, msg)
 
-    class ProductIdNoValidException(AppExceptionCase):
+    class RawMaterialIdNoValidException(AppExceptionCase):
         """_
-        Product Id invalid
+        Raw material ID invalid
         """
 
         def __init__(self, msg: str = ""):
             status_code = 422
-            msg = "Id de producto inválido"
+            msg = "Id de materia prima inválido"
             AppExceptionCase.__init__(self, status_code, msg)
 
-    class ProductInvalidUpdateParamsException(AppExceptionCase):
+    class RawMaterialInvalidUpdateParamsException(AppExceptionCase):
         """_
-        Product Invalid update parameters
+        Raw material Invalid update parameters
         """
 
         def __init__(self, msg: str = "", e: Any = None):
@@ -45,9 +45,9 @@ class ProductExceptions:
             msg = f"Parámetros de actualización inválidos: {str(error)}"
             AppExceptionCase.__init__(self, status_code, msg)
             
-    class ProductInvalidWarehouseIdException(AppExceptionCase):
+    class RawMaterialInvalidWarehouseIdException(AppExceptionCase):
         """_
-        Product Invalid warehouse id
+        Raw material Invalid warehouse id
         """
 
         def __init__(self, msg: str = ""):

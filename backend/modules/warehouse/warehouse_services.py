@@ -91,7 +91,7 @@ class WarehouseService:
             )
 
             if isinstance(warehouse, dict) and not warehouse.get("id"):
-                logger.info("El ID del almcén a actualizar no está en base de datos")
+                logger.info("El ID del almacén a actualizar no está en base de datos")
                 return ServiceResult(WarehouseExceptions.WarehouseNotFoundException())
 
             return ServiceResult(WarehouseInDB(**warehouse.dict()))

@@ -1,3 +1,4 @@
+from modules.warehouse.warehouse_repositories import WarehouseRepository
 from databases import Database
 from loguru import logger
 from typing import List
@@ -17,16 +18,25 @@ import shared.utils.repository_utils as ru
 class ProductRepository:
     def __init__(self, db: Database):
         self.db = db
-
+        
+    async def get_complete_product(self, record):
+        product = ProductInDB(**dict(record))
+        # if (product.warehouse_id):            
+        #     warehouse = await WarehouseRepository(self.db).get_warehouse_by_id(product.warehouse_id)
+        #     if warehouse:
+        #         product.warehouse = warehouse
+        #     else:
+        #         raise ProductExceptions.ProductInvalidWarehouseIdException()
+        return product
+    
     async def create_product(self, product: ProductToSave) -> ProductInDB:
         from modules.product.product_sqlstatements import CREATE_PRODUCT_ITEM
 
         values = ru.preprocess_create(product.dict())
         record = await self.db.fetch_one(query=CREATE_PRODUCT_ITEM, values=values)
 
-        result = record_to_dict(record)
+        return await self.get_complete_product(record_to_dict(record))
 
-        return ProductInDB(**result)
     
     async def get_product_list(
         self,
@@ -57,7 +67,7 @@ class ProductRepository:
         if len(records) == 0 or not records:
             return []
         
-        return [ProductInDB(**dict(record)) for record in records] 
+        return [await self.get_complete_product(record) for record in records]
     
     async def get_product_by_id(self, id: UUID) -> ProductInDB | dict:
         from modules.product.product_sqlstatements import GET_PRODUCT_BY_ID
@@ -67,8 +77,8 @@ class ProductRepository:
         if not record:
             return {}
 
-        product = record_to_dict(record)
-        return ProductInDB(**product)
+        return await self.get_complete_product(record_to_dict(record))
+
     
     async def update_product(
         self,
@@ -84,7 +94,7 @@ class ProductRepository:
 
         product_update_params = product.copy(update=product_update.dict(exclude_unset=True))
 
-        product_params_dict = product_update_params.dict()
+        product_params_dict = dict(product_update_params)
         product_params_dict["updated_by"] = updated_by_id
         product_params_dict["updated_at"] = ru._preprocess_date()
         

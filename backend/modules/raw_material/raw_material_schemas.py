@@ -6,40 +6,39 @@ from modules.warehouse.warehouse_schemas import WarehouseInDB
 
 from pydantic import BaseModel
 
-class ProductBase(BaseModel):
+
+class RawMaterialBase(BaseModel):
     name: Optional[str]
-    description: Optional[str]
-    quantity: Optional[int]
-    price: Optional[Decimal]
+    code: Optional[str]
+    available_quantity: Optional[int]
 
-class ProductCreate(ProductBase):
+class RawMaterialCreate(RawMaterialBase):
     name: str
-    quantity: int
-    price: Decimal
+    code: str
+    available_quantity: int
 
-class ProductToSave(ProductCreate):
+class RawMaterialToSave(RawMaterialCreate):
     created_by: Optional[UUID]
     updated_by: Optional[UUID]
 
-class ProductUpdate(ProductBase):
+class RawMaterialUpdate(RawMaterialBase):
     name: Optional[str]
-    warehouse_id: Optional[UUID]
     is_active: Optional[bool]
 
-class ProductInDB(ProductBase):
+class RawMaterialInDB(RawMaterialBase):
     id: UUID
     name: Optional[str]
-    description: Optional[str]
-    quantity: Optional[int]
-    price: Optional[Decimal]
+    code: Optional[str]
+    available_quantity: Optional[int]
     warehouse_id: Optional[UUID]
+    # warehouse: Optional[WarehouseInDB]   
     created_by: Optional[UUID]
     updated_by: Optional[UUID]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 
     def dict(self, *args, **kwargs):
-        ordered_fields = ["id", "name", "description", "quantity", "price", "warehouse_id","created_by", "updated_by", "created_at", "updated_at", ]
+        ordered_fields = ["id", "name", "code", "available_quantity","warehouse_id","warehouse", "created_by", "updated_by", "created_at", "updated_at"]
         new_fields = {field: getattr(self, field) for field in ordered_fields if hasattr(self, field)}
         return {**new_fields, **super().dict(*args, **kwargs)}
 

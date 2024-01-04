@@ -29,7 +29,8 @@ def create_product_table():
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('created_by', UUID, nullable=True),
-        sa.Column('updated_by', UUID, nullable=True)
+        sa.Column('updated_by', UUID, nullable=True),
+        sa.Column('warehouse_id', UUID, sa.ForeignKey('warehouse.id'), nullable=True)        
     )
     
     
@@ -44,7 +45,8 @@ def create_raw_material_table():
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('created_by', UUID, nullable=True),
-        sa.Column('updated_by', UUID, nullable=True)
+        sa.Column('updated_by', UUID, nullable=True),
+        sa.Column('warehouse_id', UUID, sa.ForeignKey('warehouse.id'), nullable=True)
     )
     
 def create_formula_table():

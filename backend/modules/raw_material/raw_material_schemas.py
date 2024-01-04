@@ -23,6 +23,7 @@ class RawMaterialToSave(RawMaterialCreate):
 
 class RawMaterialUpdate(RawMaterialBase):
     name: Optional[str]
+    warehouse_id: Optional[UUID]    
     is_active: Optional[bool]
 
 class RawMaterialInDB(RawMaterialBase):
@@ -31,7 +32,7 @@ class RawMaterialInDB(RawMaterialBase):
     code: Optional[str]
     available_quantity: Optional[int]
     warehouse_id: Optional[UUID]
-    # warehouse: Optional[WarehouseInDB]   
+    warehouse: Optional[WarehouseInDB]   
     created_by: Optional[UUID]
     updated_by: Optional[UUID]
     created_at: Optional[datetime]

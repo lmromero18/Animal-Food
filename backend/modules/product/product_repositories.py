@@ -21,12 +21,12 @@ class ProductRepository:
         
     async def get_complete_product(self, record):
         product = ProductInDB(**dict(record))
-        # if (product.warehouse_id):            
-        #     warehouse = await WarehouseRepository(self.db).get_warehouse_by_id(product.warehouse_id)
-        #     if warehouse:
-        #         product.warehouse = warehouse
-        #     else:
-        #         raise ProductExceptions.ProductInvalidWarehouseIdException()
+        if (product.warehouse_id):            
+            warehouse = await WarehouseRepository(self.db).get_warehouse_by_id(product.warehouse_id)
+            if warehouse:
+                product.warehouse = warehouse
+            else:
+                raise ProductExceptions.ProductInvalidWarehouseIdException()
         return product
     
     async def create_product(self, product: ProductToSave) -> ProductInDB:
@@ -93,10 +93,14 @@ class ProductRepository:
             return {}
 
         product_update_params = product.copy(update=product_update.dict(exclude_unset=True))
-
+            
         product_params_dict = dict(product_update_params)
         product_params_dict["updated_by"] = updated_by_id
-        product_params_dict["updated_at"] = ru._preprocess_date()
+        product_params_dict["updated_at"] = ru._preprocess_date()        
+        
+        #Si viene warehouse eliminarlo del diccionario para que no se actualice
+        if "warehouse" in product_params_dict:
+            del product_params_dict["warehouse"]
         
         try:
             record = await self.db.fetch_one(query=UPDATE_PRODUCT_BY_ID, values=product_params_dict)

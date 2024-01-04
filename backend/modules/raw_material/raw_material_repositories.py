@@ -21,12 +21,12 @@ class RawMaterialRepository:
         
     async def get_complete_raw_material(self, record):
         raw_material = RawMaterialInDB(**dict(record))
-        # if (raw_material.warehouse_id):            
-        #     warehouse = await WarehouseRepository(self.db).get_warehouse_by_id(raw_material.warehouse_id)
-        #     if warehouse:
-        #         raw_material.warehouse = warehouse
-        #     else:
-        #         raise RawMaterialExceptions.RawMaterialInvalidWarehouseIdException()
+        if (raw_material.warehouse_id):            
+            warehouse = await WarehouseRepository(self.db).get_warehouse_by_id(raw_material.warehouse_id)
+            if warehouse:
+                raw_material.warehouse = warehouse
+            else:
+                raise RawMaterialExceptions.RawMaterialInvalidWarehouseIdException()
         return raw_material
 
     async def create_raw_material(self, raw_material: RawMaterialToSave) -> RawMaterialInDB:
@@ -98,6 +98,10 @@ class RawMaterialRepository:
         raw_material_params_dict = raw_material_update_params.dict()
         raw_material_params_dict["updated_by"] = updated_by_id
         raw_material_params_dict["updated_at"] = ru._preprocess_date()
+        
+           #Si viene warehouse eliminarlo del diccionario para que no se actualice
+        if "warehouse" in raw_material_params_dict:
+            del raw_material_params_dict["warehouse"]
         
         try:
             record = await self.db.fetch_one(query=UPDATE_RAW_MATERIAL_BY_ID, values=raw_material_params_dict)

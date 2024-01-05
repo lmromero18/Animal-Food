@@ -1,8 +1,6 @@
 from typing import List
 from uuid import UUID
 import uuid
-from modules.warehouse.warehouse_exceptions import WarehouseExceptions
-from modules.warehouse.warehouse_services import WarehouseService
 from shared.utils.record_to_dict import record_to_dict
 from shared.utils.verify_uuid import is_valid_uuid
 

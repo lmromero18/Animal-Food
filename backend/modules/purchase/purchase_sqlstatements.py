@@ -5,7 +5,7 @@ RETURNING id, supplier_id, order_date, delivery_date, raw_material_id, quantity,
 """
 
 GET_PURCHASE_LIST = """
-    SELECT p.id, p.supplier_id, p.order_date, p.delivery_date, p.raw_material_id, p.quantity, p.is_delivered, pis_active, p.created_at, p.updated_at, 
+    SELECT p.id, p.supplier_id, p.order_date, p.delivery_date, p.raw_material_id, p.quantity, p.is_delivered, p.is_active, p.created_at, p.updated_at, 
         CAST(p.created_by AS UUID) AS created_by, 
         CAST(p.updated_by AS UUID) AS updated_by,
         us1.fullname AS created_by_name, 

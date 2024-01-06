@@ -27,7 +27,6 @@ class PurchaseToSave(PurchaseCreate):
 class PurchaseUpdate(PurchaseBase):
     supplier_id: Optional[UUID]
     raw_material_id: Optional[UUID]
-    delivery_date: Optional[datetime]
     quantity: Optional[int]
     is_delivered: Optional[bool]
 

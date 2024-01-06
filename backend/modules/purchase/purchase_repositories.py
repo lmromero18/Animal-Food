@@ -1,3 +1,4 @@
+from datetime import datetime
 from modules.raw_material.raw_material_repositories import RawMaterialRepository
 from modules.supplier.supplier_repositories import SupplierRepository
 from modules.price.price_repositories import PriceRepository
@@ -105,7 +106,10 @@ class PurchaseRepository:
             
         purchase_params_dict = dict(purchase_update_params)
         purchase_params_dict["updated_by"] = updated_by_id
-        purchase_params_dict["updated_at"] = ru._preprocess_date()
+        purchase_params_dict["updated_at"] = ru._preprocess_date()        
+        
+        if (purchase_params_dict["is_delivered"] == True):
+            purchase_params_dict["delivery_date"] = datetime.now()
         
         if "raw_material" in purchase_params_dict:
             del purchase_params_dict["raw_material"]

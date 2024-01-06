@@ -84,9 +84,6 @@ class PurchaseService:
     ) -> ServiceResult:
         if not is_valid_uuid(id):
             return ServiceResult(PurchaseExceptions.PurchaseIdNoValidException())
-        
-        if purchase_update.is_delivered == 'true':
-            purchase_update.delivery_date = datetime.now()
 
         try:
             purchase = await PurchaseRepository(self.db).update_purchase(

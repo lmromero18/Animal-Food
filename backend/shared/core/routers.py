@@ -6,6 +6,7 @@ from modules.product.product_routes import product_router
 from modules.raw_material.raw_material_routes import raw_material_router
 from modules.formula.formula_routes import formula_router
 from modules.product_offered.product_offered_routes import product_offered_router
+from modules.supplier.supplier_routes import supplier_router
 
 
 
@@ -18,3 +19,4 @@ router.include_router(product_router)
 router.include_router(product_offered_router)
 router.include_router(raw_material_router)
 router.include_router(formula_router)
+router.include_router(supplier_router)

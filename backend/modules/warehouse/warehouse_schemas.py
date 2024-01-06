@@ -21,6 +21,7 @@ class WarehouseUpdate(WarehouseBase):
 class WarehouseInDB(WarehouseBase):
     id: UUID
     name: Optional[str]
+    is_active: Optional[bool]
     created_by: Optional[UUID]
     updated_by: Optional[UUID]
     created_at: Optional[datetime]

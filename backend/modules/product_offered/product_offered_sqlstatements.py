@@ -1,11 +1,11 @@
 CREATE_PRODUCT_OFFERED_ITEM = """ 
-INSERT INTO product_offered (id, name, quantity, price, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id) 
-VALUES (:id, :name,  :quantity, :price, :is_active, :created_at, :updated_at, :created_by, :updated_by, :warehouse_id, :product_id) 
-RETURNING id, name, quantity, price, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id; 
+INSERT INTO product_offered (id, name, code ,quantity, price, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id) 
+VALUES (:id, :name, :code, :quantity, :price, :is_active, :created_at, :updated_at, :created_by, :updated_by, :warehouse_id, :product_id) 
+RETURNING id, name, code, quantity, price, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id; 
 """
 
 GET_PRODUCT_OFFERED_LIST = """
-    SELECT p.id, p.name, p.quantity, p.price, p.is_active, p.created_at, p.updated_at, 
+    SELECT p.id, p.name, p.code, p.quantity, p.price, p.is_active, p.created_at, p.updated_at, 
         CAST(p.created_by AS UUID) AS created_by, 
         CAST(p.updated_by AS UUID) AS updated_by,
         us1.fullname AS created_by_name, 
@@ -22,16 +22,16 @@ GET_PRODUCT_OFFERED_LIST = """
 """
 
 def product_offered_list_search():
-    return """ WHERE (p.name LIKE :search) """
+    return """ WHERE (p.code LIKE :search) """
 
 def product_offered_list_complements(order: str | None, direction: str | None):
     sql_sentence = ""
     if not order and not direction:
-        sql_sentence = " ORDER BY p.name ASC;"
-    elif order == "name" and direction == "DESC":
-        sql_sentence = " ORDER BY p.name DESC;"
-    elif order == "name" and (direction == "ASC" or direction == None):
-        sql_sentence = " ORDER BY p.name ASC;"
+        sql_sentence = " ORDER BY p.code ASC;"
+    elif order == "code" and direction == "DESC":
+        sql_sentence = " ORDER BY p.code DESC;"
+    elif order == "code" and (direction == "ASC" or direction == None):
+        sql_sentence = " ORDER BY p.code ASC;"
     elif order == "status" and direction == "DESC":
         sql_sentence = " ORDER BY p.is_active DESC;"
     elif order == "status" and (direction == "ASC" or direction == None):
@@ -40,7 +40,7 @@ def product_offered_list_complements(order: str | None, direction: str | None):
     return sql_sentence
 
 GET_PRODUCT_OFFERED_BY_ID = """
-    SELECT p.id, p.name, p.quantity, p.price, p.is_active, p.created_at, p.updated_at, 
+    SELECT p.id, p.name, p.code, p.quantity, p.price, p.is_active, p.created_at, p.updated_at, 
         CAST(p.created_by AS UUID) AS created_by, 
         CAST(p.updated_by AS UUID) AS updated_by,
         us1.fullname AS created_by_name, 

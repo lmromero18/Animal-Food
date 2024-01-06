@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from uuid import UUID
 import uuid
@@ -27,11 +28,26 @@ from shared.utils.short_pagination import short_pagination
 class ProductOfferedService:
     def __init__(self, db: Database):
         self.db = db
+                
+    def generate_product_code(self):
+        # Obtén la fecha actual
+        now = datetime.now()
+
+        # Extrae el año, la semana del año y el día de la semana
+        year = now.strftime("%y")  # Año en formato YY
+        week = str((now.timetuple().tm_yday - 1) // 7 + 1).zfill(2)  # Semana del año en formato SS
+        day = now.weekday() + 1    # Día de la semana como un entero (1=Lunes, 7=Domingo)
+
+        # Genera el código del producto
+        product_code = f"{year}-{week}-{day}"
+
+        return product_code
   
     async def create_product_offered(
         self, product_offered: ProductOfferedCreate, current_user: UserInDB):
 
         new_product_offered = ProductOfferedToSave(**product_offered.dict())
+        new_product_offered.code = self.generate_product_code()
         new_product_offered.created_by = current_user.id
         new_product_offered.updated_by = uuid.UUID(int=0)
 

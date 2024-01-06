@@ -35,6 +35,7 @@ def create_product_offered_table():
         'product_offered',
         sa.Column("id", UUID, primary_key=True, default=uuid4()),
         sa.Column('name', sa.String(100), unique=True),
+        sa.Column('code', sa.String(12)),   
         sa.Column('quantity', sa.Integer),        
         sa.Column('price', sa.Numeric(precision=10, scale=2)),
         sa.Column('is_active', sa.Boolean, default=True),

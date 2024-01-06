@@ -24,6 +24,7 @@ class ProductOfferedCreate(ProductOfferedBase):
 
 
 class ProductOfferedToSave(ProductOfferedCreate):
+    code: Optional[str]
     created_by: Optional[UUID]
     updated_by: Optional[UUID]
 
@@ -40,6 +41,7 @@ class ProductOfferedUpdate(ProductOfferedBase):
 class ProductOfferedInDB(ProductOfferedBase):
     id: UUID
     name: Optional[str]
+    code: Optional[str]
     quantity: Optional[int]
     price: Optional[Decimal]
     warehouse_id: Optional[UUID]
@@ -53,7 +55,7 @@ class ProductOfferedInDB(ProductOfferedBase):
 
     def dict(self, *args, **kwargs):
         ordered_fields = [
-            "id", "name", "quantity", "price", "product_id", "product", 
+            "id", "name", "code", "quantity", "price", "product_id", "product", 
             "warehouse_id", "warehouse","created_by", "updated_by", "created_at", "updated_at",
         ]
         new_fields = {field: getattr(self, field) for field in ordered_fields if hasattr(self, field)}

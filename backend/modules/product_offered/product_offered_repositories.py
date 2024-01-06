@@ -2,7 +2,7 @@ from modules.product.product_repositories import ProductRepository
 from modules.warehouse.warehouse_repositories import WarehouseRepository
 from databases import Database
 from loguru import logger
-from typing import List
+from typing import Any, Dict, List, Union
 from uuid import UUID
 
 from modules.product_offered.product_offered_exceptions import ProductOfferedExceptions
@@ -37,15 +37,24 @@ class ProductOfferedRepository:
                 raise ProductOfferedExceptions.ProductOfferedInvalidProductIdException()
         return product_offered
     
-    async def create_product_offered(self, product_offered: ProductOfferedToSave) -> ProductOfferedInDB:
-        from modules.product_offered.product_offered_sqlstatements import CREATE_PRODUCT_OFFERED_ITEM
+    async def create_product_offered(self, product_offered: ProductOfferedToSave) ->Union[bool, ProductOfferedInDB]:
+        from modules.product_offered.product_offered_sqlstatements import CREATE_PRODUCT_OFFERED_ITEM, CHECK_FORMULA_REQUIREMENTS
 
+        # First, check the formula requirements
+        values = {'product_id': product_offered.product_id, 'product_quantity': product_offered.quantity}
+        formula_requirements_result = await self.db.fetch_one(query=CHECK_FORMULA_REQUIREMENTS, values=values)
+        
+        # If the result is not 'true', return false
+        if formula_requirements_result['case'] == 'false':            
+            return formula_requirements_result['case']	
+
+        # If the result is 'true', continue with the saving process
         values = ru.preprocess_create(product_offered.dict())
         record = await self.db.fetch_one(query=CREATE_PRODUCT_OFFERED_ITEM, values=values)
 
         return await self.get_complete_product_offered(record_to_dict(record))
 
-    
+   
     async def get_product_offered_list(
         self,
         search: str | None,

@@ -64,8 +64,9 @@ def create_raw_material_table():
 def create_formula_table():
     op.create_table(
         'formula',
-        sa.Column('product_id', UUID, sa.ForeignKey('product.id'), primary_key=True),
-        sa.Column('raw_material_id', UUID, sa.ForeignKey('rawmaterial.id'), primary_key=True),
+        sa.Column("id", UUID, primary_key=True, default=uuid4()),
+        sa.Column('product_id', UUID, sa.ForeignKey('product.id')),
+        sa.Column('raw_material_id', UUID, sa.ForeignKey('rawmaterial.id')),
         sa.Column('required_quantity', sa.Integer),
         sa.Column('is_active', sa.Boolean, default=True),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),

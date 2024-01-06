@@ -64,3 +64,13 @@ class ProductOfferedExceptions:
             status_code = 422
             msg = "ID de producto inválido para el producto ofrecido"
             AppExceptionCase.__init__(self, status_code, msg)
+            
+    class ProductOfferedRequirementsNotMetCreateException(AppExceptionCase):
+        """_
+        Product offered requirements not met
+        """
+
+        def __init__(self, msg: str = ""):
+            status_code = 422
+            msg = "No se cumplen los requisitos para crear el producto ofrecido"
+            AppExceptionCase.__init__(self, status_code, msg)

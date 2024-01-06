@@ -78,8 +78,7 @@ class RawMaterialRepository:
         if not record:
             return {}
 
-        raw_material = record_to_dict(record)
-        return RawMaterialInDB(**raw_material)
+        return await self.get_complete_raw_material(record_to_dict(record))
     
     async def update_raw_material(
         self,

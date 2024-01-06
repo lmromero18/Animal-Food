@@ -78,3 +78,36 @@ DELETE_PRODUCT_OFFERED_BY_ID = """
     WHERE id = :id
     RETURNING id;
 """
+
+CHECK_FORMULA_REQUIREMENTS = """
+WITH formula_requirements AS (
+    SELECT
+        f.raw_material_id,
+        f.required_quantity * :product_quantity AS total_required_quantity,
+        r.available_quantity,
+        r.name AS raw_material_name,
+        (f.required_quantity * :product_quantity - r.available_quantity) AS quantity_missing
+    FROM formula f JOIN
+    rawmaterial r ON f.raw_material_id = r.id
+    WHERE f.product_id = :product_id),
+    requirements_not_met AS (
+    SELECT * FROM formula_requirements WHERE quantity_missing > 0),
+    update_requirements AS (
+    SELECT
+        raw_material_id,
+        available_quantity - total_required_quantity AS new_quantity
+    FROM formula_requirements
+    WHERE NOT EXISTS (SELECT 1 FROM requirements_not_met)
+),
+update_rawmaterial AS (
+    UPDATE rawmaterial
+    SET available_quantity = update_requirements.new_quantity
+    FROM update_requirements
+    WHERE rawmaterial.id = update_requirements.raw_material_id
+    RETURNING *)
+SELECT CASE
+    WHEN EXISTS (SELECT 1 FROM requirements_not_met) THEN 'false'
+    WHEN EXISTS (SELECT 1 FROM update_rawmaterial) THEN 'true'
+    ELSE 'false'
+END;
+"""

@@ -37,9 +37,13 @@ class ProductOfferedService:
 
         product_offered_item = await ProductOfferedRepository(self.db).create_product_offered(new_product_offered)
 
-        if not product_offered_item:
+        if product_offered_item == 'false':
+            logger.error("Formula requirements not met for product offered")
+            return ServiceResult(ProductOfferedExceptions.ProductOfferedRequirementsNotMetCreateException())
+        elif not product_offered_item:
             logger.error("Error creating product offered")
             return ServiceResult(ProductOfferedExceptions.ProductOfferedCreateException())
+
 
         return ServiceResult(product_offered_item)
     

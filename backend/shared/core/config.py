@@ -8,8 +8,8 @@ from starlette.datastructures import Secret
 
 config = Config(".env")
 
-PROJECT_NAME = "FASTAPI_TDD_DEMO"
-DESCRIPTION = "Proyecto Demo Para Desarrollo de APIs con Python"
+PROJECT_NAME = "Animal Food"
+DESCRIPTION = "Proyecto Para Desarrollo de APIs con Python"
 DEBUG: bool = False
 TIMEZONE: str = "UTC"
 

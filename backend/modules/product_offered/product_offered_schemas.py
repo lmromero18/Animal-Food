@@ -12,7 +12,6 @@ from modules.warehouse.warehouse_schemas import WarehouseInDB
 class ProductOfferedBase(BaseModel):
     name: Optional[str] | None
     quantity: Optional[int] | None
-    price: Optional[Decimal] | None
     product_id: Optional[UUID] | None
     warehouse_id: Optional[UUID] | None
 
@@ -20,7 +19,6 @@ class ProductOfferedBase(BaseModel):
 class ProductOfferedCreate(ProductOfferedBase):
     name: str
     quantity: Optional[int]
-    price: Optional[Decimal]
 
 
 class ProductOfferedToSave(ProductOfferedCreate):
@@ -32,7 +30,6 @@ class ProductOfferedToSave(ProductOfferedCreate):
 class ProductOfferedUpdate(ProductOfferedBase):
     name: Optional[str]
     quantity: Optional[int]
-    price: Optional[Decimal]
     product_id: Optional[UUID]
     warehouse_id: Optional[UUID]
     is_active: Optional[bool]
@@ -43,7 +40,6 @@ class ProductOfferedInDB(ProductOfferedBase):
     name: Optional[str]
     code: Optional[str]
     quantity: Optional[int]
-    price: Optional[Decimal]
     warehouse_id: Optional[UUID]
     warehouse: Optional[WarehouseInDB]
     product_id: Optional[UUID]
@@ -55,7 +51,7 @@ class ProductOfferedInDB(ProductOfferedBase):
 
     def dict(self, *args, **kwargs):
         ordered_fields = [
-            "id", "name", "code", "quantity", "price", "product_id", "product", 
+            "id", "name", "code", "quantity", "product_id", "product", 
             "warehouse_id", "warehouse","created_by", "updated_by", "created_at", "updated_at",
         ]
         new_fields = {field: getattr(self, field) for field in ordered_fields if hasattr(self, field)}

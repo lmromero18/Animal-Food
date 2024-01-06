@@ -1,11 +1,11 @@
 CREATE_PRODUCT_OFFERED_ITEM = """ 
-INSERT INTO product_offered (id, name, code ,quantity, price, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id) 
-VALUES (:id, :name, :code, :quantity, :price, :is_active, :created_at, :updated_at, :created_by, :updated_by, :warehouse_id, :product_id) 
-RETURNING id, name, code, quantity, price, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id; 
+INSERT INTO product_offered (id, name, code ,quantity, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id) 
+VALUES (:id, :name, :code, :quantity,  :is_active, :created_at, :updated_at, :created_by, :updated_by, :warehouse_id, :product_id) 
+RETURNING id, name, code, quantity, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id; 
 """
 
 GET_PRODUCT_OFFERED_LIST = """
-    SELECT p.id, p.name, p.code, p.quantity, p.price, p.is_active, p.created_at, p.updated_at, 
+    SELECT p.id, p.name, p.code, p.quantity, p.is_active, p.created_at, p.updated_at, 
         CAST(p.created_by AS UUID) AS created_by, 
         CAST(p.updated_by AS UUID) AS updated_by,
         us1.fullname AS created_by_name, 
@@ -40,7 +40,7 @@ def product_offered_list_complements(order: str | None, direction: str | None):
     return sql_sentence
 
 GET_PRODUCT_OFFERED_BY_ID = """
-    SELECT p.id, p.name, p.code, p.quantity, p.price, p.is_active, p.created_at, p.updated_at, 
+    SELECT p.id, p.name, p.code, p.quantity, p.is_active, p.created_at, p.updated_at, 
         CAST(p.created_by AS UUID) AS created_by, 
         CAST(p.updated_by AS UUID) AS updated_by,
         us1.fullname AS created_by_name, 
@@ -61,7 +61,7 @@ UPDATE_PRODUCT_OFFERED_BY_ID = """
     UPDATE product_offered
     SET name = :name,
         quantity = :quantity,
-        price = :price,
+        code = :code,
         is_active = :is_active,
         created_at = :created_at,
         updated_at = :updated_at,
@@ -70,7 +70,7 @@ UPDATE_PRODUCT_OFFERED_BY_ID = """
         warehouse_id = :warehouse_id,
         product_id = :product_id
     WHERE id = :id
-    RETURNING id, name, quantity, price, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id;
+    RETURNING id, name, code, quantity, is_active, created_at, updated_at, created_by, updated_by, warehouse_id, product_id;
 """
 
 DELETE_PRODUCT_OFFERED_BY_ID = """

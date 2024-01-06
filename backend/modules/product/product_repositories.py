@@ -1,3 +1,4 @@
+from modules.price.price_repositories import PriceRepository
 from databases import Database
 from loguru import logger
 from typing import List
@@ -20,6 +21,12 @@ class ProductRepository:
         
     async def get_complete_product(self, record):
         product = ProductInDB(**dict(record))
+        if (product.price_id):            
+            price = await PriceRepository(self.db).get_price_by_id(product.price_id)
+            if price:
+                product.price = price
+            else:
+                raise ProductExceptions.ProductCreateException()
         return product
     
     async def create_product(self, product: ProductToSave) -> ProductInDB:
@@ -89,7 +96,10 @@ class ProductRepository:
             
         product_params_dict = dict(product_update_params)
         product_params_dict["updated_by"] = updated_by_id
-        product_params_dict["updated_at"] = ru._preprocess_date()        
+        product_params_dict["updated_at"] = ru._preprocess_date()  
+        
+        if "price" in product_params_dict:
+            del product_params_dict["price"]
         
         try:
             record = await self.db.fetch_one(query=UPDATE_PRODUCT_BY_ID, values=product_params_dict)

@@ -8,6 +8,7 @@ from modules.formula.formula_routes import formula_router
 from modules.product_offered.product_offered_routes import product_offered_router
 from modules.supplier.supplier_routes import supplier_router
 from modules.purchase.purchase_routes import purchase_router
+from modules.order.order_routes import order_router
 
 
 
@@ -22,3 +23,4 @@ router.include_router(raw_material_router)
 router.include_router(formula_router)
 router.include_router(supplier_router)
 router.include_router(purchase_router)
+router.include_router(order_router)

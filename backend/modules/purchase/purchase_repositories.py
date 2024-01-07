@@ -121,7 +121,7 @@ class PurchaseRepository:
             raw_material = await RawMaterialRepository(self.db).get_raw_material_by_id(purchase.raw_material_id)
             if raw_material:
                 raw_material.available_quantity += purchase_params_dict["quantity"]
-                await RawMaterialRepository(self.db).update_raw_material(id=purchase.raw_material_id, raw_material_update=raw_material, updated_by_id=purchase.raw_material_id)
+                await RawMaterialRepository(self.db).update_raw_material(id=purchase.raw_material_id, raw_material_update=raw_material, updated_by_id=updated_by_id)
             else:
                 raise PurchaseExceptions.PurchaseInvalidUpdateParamsException()            
         

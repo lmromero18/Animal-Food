@@ -116,6 +116,14 @@ class PurchaseRepository:
         
         if "supplier" in purchase_params_dict:
             del purchase_params_dict["supplier"]
+            
+        if purchase_params_dict["is_delivered"] == True:
+            raw_material = await RawMaterialRepository(self.db).get_raw_material_by_id(purchase.raw_material_id)
+            if raw_material:
+                raw_material.available_quantity += purchase_params_dict["quantity"]
+                await RawMaterialRepository(self.db).update_raw_material(id=purchase.raw_material_id, raw_material_update=raw_material, updated_by_id=purchase.raw_material_id)
+            else:
+                raise PurchaseExceptions.PurchaseInvalidUpdateParamsException()            
         
         try:
             record = await self.db.fetch_one(query=UPDATE_PURCHASE_BY_ID, values=purchase_params_dict)

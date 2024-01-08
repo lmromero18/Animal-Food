@@ -3,8 +3,10 @@ from typing import List
 from uuid import UUID
 import uuid
 from modules.warehouse.warehouse_exceptions import WarehouseExceptions
-from modules.warehouse.warehouse_services import WarehouseService
-from shared.utils.record_to_dict import record_to_dict
+from modules.warehouse.warehouse_repositories import WarehouseRepository
+from modules.product.product_exceptions import ProductExceptions
+from modules.product.product_repositories import ProductRepository
+from modules.backlog.backlog_repositories import BacklogRepository
 from shared.utils.verify_uuid import is_valid_uuid
 
 from databases import Database
@@ -50,9 +52,32 @@ class ProductOfferedService:
         new_product_offered.code = self.generate_product_code()
         new_product_offered.created_by = current_user.id
         new_product_offered.updated_by = uuid.UUID(int=0)
+        
+        if new_product_offered.quantity <= 0:
+            logger.info("La cantidad debe ser mayor a 0")
+            return ServiceResult(ProductOfferedExceptions.ProductOfferedQuantityException())
+        
+        warehouse_item = await WarehouseRepository(self.db).get_warehouse_by_id(id=new_product_offered.warehouse_id)
+        if not warehouse_item:
+            logger.info("El almacén solicitado no está en base de datos")
+            return ServiceResult(WarehouseExceptions.WarehouseNotFoundException())
+        
+        product_item = await ProductRepository(self.db).get_product_by_id(id=new_product_offered.product_id)
+        if not product_item:
+            logger.info("El producto solicitado no está en base de datos")
+            return ServiceResult(ProductExceptions.ProductNotFoundException())
+        
+        new_product_offered.name = product_item.name
 
         product_offered_item = await ProductOfferedRepository(self.db).create_product_offered(new_product_offered)
-
+        
+        if (product_offered_item.product_id and product_offered_item.quantity > 0):
+            await BacklogRepository(self.db).update_backlog_by_product_id(
+                product_id=product_offered_item.product_id,
+                quantity=product_offered_item.quantity,
+                updated_by_id=current_user.id,
+            )
+            
         if product_offered_item == 'false':
             logger.error("Formula requirements not met for product offered")
             return ServiceResult(ProductOfferedExceptions.ProductOfferedRequirementsNotMetCreateException())
@@ -103,6 +128,22 @@ class ProductOfferedService:
     ) -> ServiceResult:
         if not is_valid_uuid(id):
             return ServiceResult(ProductOfferedExceptions.ProductOfferedIdNoValidException())
+
+        if product_offered_update.quantity <= 0:
+            logger.info("La cantidad debe ser mayor a 0")
+            return ServiceResult(ProductOfferedExceptions.ProductOfferedQuantityException())
+        
+        warehouse_item = await WarehouseRepository(self.db).get_warehouse_by_id(id=product_offered_update.warehouse_id)
+        if not warehouse_item:
+            logger.info("El almacén solicitado no está en base de datos")
+            return ServiceResult(WarehouseExceptions.WarehouseNotFoundException())
+        
+        product_item = await ProductRepository(self.db).get_product_by_id(id=product_offered_update.product_id)
+        if not product_item:
+            logger.info("El producto solicitado no está en base de datos")
+            return ServiceResult(ProductExceptions.ProductNotFoundException())
+        
+        product_offered_update.name = product_item.name
 
         try:
             product_offered = await ProductOfferedRepository(self.db).update_product_offered(

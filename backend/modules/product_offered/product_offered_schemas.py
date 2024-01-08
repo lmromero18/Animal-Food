@@ -10,18 +10,17 @@ from modules.warehouse.warehouse_schemas import WarehouseInDB
 
 
 class ProductOfferedBase(BaseModel):
-    name: Optional[str] | None
     quantity: Optional[int] | None
     product_id: Optional[UUID] | None
     warehouse_id: Optional[UUID] | None
 
 
 class ProductOfferedCreate(ProductOfferedBase):
-    name: str
     quantity: Optional[int]
 
 
 class ProductOfferedToSave(ProductOfferedCreate):
+    name: Optional[str]
     code: Optional[str]
     created_by: Optional[UUID]
     updated_by: Optional[UUID]

@@ -2,6 +2,9 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 import uuid
+from modules.backlog.backlog_exceptions import BacklogExceptions
+from modules.backlog.backlog_schemas import BacklogToSave
+from modules.backlog.backlog_repositories import BacklogRepository
 from modules.product_offered.product_offered_exceptions import ProductOfferedExceptions
 from modules.product_offered.product_offered_repositories import ProductOfferedRepository
 from shared.utils.verify_uuid import is_valid_uuid
@@ -37,6 +40,7 @@ class OrderService:
         new_order.created_by = current_user.id
         new_order.updated_by = uuid.UUID(int=0)        
                
+        
         product_item = await ProductOfferedRepository(self.db).get_product_offered_by_id(id=new_order.product_offered_id)
         if not product_item:
             logger.info("El producto solicitado no está en base de datos")
@@ -50,6 +54,17 @@ class OrderService:
             return ServiceResult(OrderExceptions.OrderQuantityException())
         
         if (product_item and (new_order.quantity > product_item.quantity)):
+            backlog = BacklogToSave(
+                product_id=product_item.product_id,
+                required_quantity=new_order.quantity - product_item.quantity,
+                created_by=current_user.id,
+                updated_by=uuid.UUID(int=0)
+            )
+            create_backlog = await BacklogRepository(self.db).create_backlog(backlog)
+            if not create_backlog:
+                logger.error("Error creating backlog")
+                return ServiceResult(BacklogExceptions.BacklogCreateException())
+            
             logger.info("La cantidad solicitada no está disponible")
             return ServiceResult(OrderExceptions.OrderQuantityNotAvailableException(product_item.quantity, new_order.quantity))
         

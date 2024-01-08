@@ -9,6 +9,7 @@ from modules.product_offered.product_offered_routes import product_offered_route
 from modules.supplier.supplier_routes import supplier_router
 from modules.purchase.purchase_routes import purchase_router
 from modules.order.order_routes import order_router
+from modules.backlog.backlog_routes import backlog_router
 
 
 
@@ -24,3 +25,4 @@ router.include_router(formula_router)
 router.include_router(supplier_router)
 router.include_router(purchase_router)
 router.include_router(order_router)
+router.include_router(backlog_router)

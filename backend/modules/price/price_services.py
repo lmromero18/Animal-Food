@@ -31,6 +31,10 @@ class PriceService:
         new_price = PriceToSave(**price.dict())
         new_price.created_by = current_user.id
         new_price.updated_by = uuid.UUID(int=0)
+        
+        if new_price.price <= 0:
+            logger.info("El precio debe ser mayor a 0")
+            return ServiceResult(PriceExceptions.LowPriceException())
 
         price_item = await PriceRepository(self.db).create_price(new_price)
 
@@ -80,6 +84,10 @@ class PriceService:
     ) -> ServiceResult:
         if not is_valid_uuid(id):
             return ServiceResult(PriceExceptions.PriceIdNoValidException())
+        
+        if price_update.price <= 0:
+            logger.info("El precio debe ser mayor a 0")
+            return ServiceResult(PriceExceptions.LowPriceException())
 
         try:
             price = await PriceRepository(self.db).update_price(

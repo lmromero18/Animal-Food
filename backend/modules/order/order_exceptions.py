@@ -67,7 +67,7 @@ class OrderExceptions:
           self.stock = stock
           self.quantity = quantity
           status_code = 422
-          msg = f"Cantidad inválida: La cantidad ({self.quantity}) no puede ser mayor al stock ({self.stock})."
+          msg = f"Cantidad inválida: La cantidad debe ser mayor que 0."
           AppExceptionCase.__init__(self, status_code, msg)
           
     class OrderQuantityNotAvailableException(AppExceptionCase):
@@ -79,5 +79,5 @@ class OrderExceptions:
           self.stock = stock
           self.quantity = quantity
           status_code = 422
-          msg = f"Cantidad inválida: La cantidad ({self.quantity}) no puede ser mayor al stock ({self.stock})."
+          msg = f"Cantidad inválida: La cantidad ({self.quantity}) no puede ser mayor al stock ({self.stock}). Se ha creado un backlog."
           AppExceptionCase.__init__(self, status_code, msg)

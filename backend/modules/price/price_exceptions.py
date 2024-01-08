@@ -54,3 +54,13 @@ class PriceExceptions:
             status_code = 422
             msg = "Id de almacén inválido"
             AppExceptionCase.__init__(self, status_code, msg)
+
+    class LowPriceException(AppExceptionCase):
+        """_
+        Low price
+        """
+
+        def __init__(self, msg: str = ""):
+            status_code = 422
+            msg = "El precio debe ser mayor a 0"
+            AppExceptionCase.__init__(self, status_code, msg)

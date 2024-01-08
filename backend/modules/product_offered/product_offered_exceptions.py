@@ -74,3 +74,13 @@ class ProductOfferedExceptions:
             status_code = 422
             msg = "No se cumplen los requisitos para crear el producto ofrecido"
             AppExceptionCase.__init__(self, status_code, msg)
+            
+    class ProductOfferedQuantityException(AppExceptionCase):
+        """_
+        Product offered quantity exception
+        """
+
+        def __init__(self, msg: str = ""):
+            status_code = 422
+            msg = "La cantidad debe ser mayor a 0"
+            AppExceptionCase.__init__(self, status_code, msg)

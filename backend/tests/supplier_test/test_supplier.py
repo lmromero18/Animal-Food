@@ -4,8 +4,6 @@ import pytest
 from fastapi import FastAPI, status
 from loguru import logger
 from httpx import AsyncClient
-from modules.supplier.supplier_schemas import SupplierCreate, SupplierInDB, SupplierUpdate
-from modules.supplier.supplier_schemas import (SupplierCreate)
 
 
 pytestmark = pytest.mark.asyncio

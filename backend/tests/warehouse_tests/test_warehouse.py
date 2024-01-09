@@ -24,7 +24,7 @@ class TestWarehouseCreate:
         assert res.status_code == status.HTTP_201_CREATED
     
 
-class TestWarehouseGeByListRoutes:
+class TestWarehouseGetByListRoutes:
     async def test_warehouse_list_route_exists(self, app: FastAPI, client:AsyncClient) -> None:
         res = await client.get(app.url_path_for("warehouse:warehouse_list"))
         assert res.status_code != status.HTTP_404_NOT_FOUND
@@ -51,7 +51,12 @@ class TestWarehouseGetById:
         # Include the id in the URL, not the request body
         res = await client.get(app.url_path_for("warehouse:get-warehouse-by-id", id=warehouse_id))
         assert res.status_code == status.HTTP_200_OK
-        
+
+class TestWarehouseUpdateRoutes:
+    async def test_warehouse_update_route_exists(self, app: FastAPI, client:AsyncClient) -> None:
+        res = await client.get(app.url_path_for("warehouse:update-warehouse-by-id", id="123e4567-e89b-12d3-a456-426614174000"))
+        assert res.status_code != status.HTTP_404_NOT_FOUND
+
 class TestWarehouseUpdateById:
     async def test_warehouse_update_by_id_route(self, authorized_client: AsyncClient, app:FastAPI) -> None:
         client = await authorized_client
@@ -63,6 +68,11 @@ class TestWarehouseUpdateById:
         warehouse_update = {"type": "updated_test"} 
         res = await client.put(app.url_path_for("warehouse:update-warehouse-by-id", id=warehouse_id), json={"warehouse_update": warehouse_update})
         assert res.status_code == status.HTTP_200_OK
+
+class TestWarehouseUpdateRoutes:
+    async def test_warehouse_delete_route_exists(self, app: FastAPI, client:AsyncClient) -> None:
+        res = await client.get(app.url_path_for("warehouse:delete-warehouse-by-id", id="123e4567-e89b-12d3-a456-426614174000"))
+        assert res.status_code != status.HTTP_404_NOT_FOUND
 
 class TestWarehouseDeleteById:
     async def test_warehouse_delete_by_id_route(self, authorized_client: AsyncClient, app:FastAPI) -> None:

@@ -79,7 +79,7 @@ class ProductOfferedService:
 
         product_offered_item = await ProductOfferedRepository(self.db).create_product_offered(new_product_offered)
         
-        if (product_offered_item.product_id and product_offered_item.quantity > 0):
+        if (product_offered_item != "false" and product_offered_item.product_id and product_offered_item.quantity > 0):
             await BacklogRepository(self.db).update_backlog_by_product_id(
                 product_id=product_offered_item.product_id,
                 quantity=product_offered_item.quantity,
@@ -143,6 +143,7 @@ class ProductOfferedService:
             return ServiceResult(WarehouseExceptions.WarehouseNotFoundException())
         
         product_item = await ProductRepository(self.db).get_product_by_id(id=product_offered_update.product_id)
+        
         if not product_item:
             logger.info("El producto solicitado no está en base de datos")
             return ServiceResult(ProductExceptions.ProductNotFoundException())

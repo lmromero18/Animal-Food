@@ -48,7 +48,6 @@ class TestWarehouseGetById:
         warehouse_list = warehouse_list_response.json().get("data")[0]
         warehouse_id = warehouse_list.get("id")
         
-        # Include the id in the URL, not the request body
         res = await client.get(app.url_path_for("warehouse:get-warehouse-by-id", id=warehouse_id))
         assert res.status_code == status.HTTP_200_OK
 

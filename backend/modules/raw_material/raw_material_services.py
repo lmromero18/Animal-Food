@@ -35,7 +35,7 @@ class RawMaterialService:
         new_raw_material.created_by = current_user.id
         new_raw_material.updated_by = uuid.UUID(int=0)
         
-        if new_raw_material.quantity <= 0:
+        if new_raw_material.available_quantity <= 0:
             logger.info("The quantity must be greater than 0")
             return ServiceResult(RawMaterialExceptions.LowQuantityException())
         

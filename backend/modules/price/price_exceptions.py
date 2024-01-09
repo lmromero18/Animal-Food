@@ -64,3 +64,13 @@ class PriceExceptions:
             status_code = 422
             msg = "El precio debe ser mayor a 0"
             AppExceptionCase.__init__(self, status_code, msg)
+            
+    class PriceProductExistsException(AppExceptionCase):
+        """_
+        Price product exists
+        """
+
+        def __init__(self, msg: str = ""):
+            status_code = 422
+            msg = "El producto ya tiene un precio asignado"
+            AppExceptionCase.__init__(self, status_code, msg)

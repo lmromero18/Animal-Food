@@ -17,18 +17,6 @@ down_revision = '17201cc0e1f7'
 branch_labels = None
 depends_on = None
 
-def create_price_table() -> None:
-    op.create_table(
-        'price',
-        sa.Column("id", UUID, primary_key=True, default=uuid4()),
-        sa.Column("is_active", sa.Boolean, default=True),
-        sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
-        sa.Column("created_by", UUID, nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("updated_by", UUID, nullable=True),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
-    )
-
 def create_product_table():
     op.create_table(
         'product',
@@ -40,7 +28,19 @@ def create_product_table():
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('created_by', UUID, nullable=True),
         sa.Column('updated_by', UUID, nullable=True),
-        sa.Column('price_id', UUID, sa.ForeignKey('price.id'), nullable=True),
+    )
+    
+def create_price_table() -> None:
+    op.create_table(
+        'price',
+        sa.Column("id", UUID, primary_key=True, default=uuid4()),
+        sa.Column("is_active", sa.Boolean, default=True),
+        sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
+        sa.Column("created_by", UUID, nullable=True),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("updated_by", UUID, nullable=True),
+        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("product_id", UUID, sa.ForeignKey("product.id"), nullable=True),
     )
     
 def create_product_offered_table():
@@ -90,16 +90,16 @@ def create_formula_table():
 
 
 def upgrade() -> None:
-    create_price_table()
     create_product_table()
+    create_price_table()
     create_product_offered_table()
     create_raw_material_table()
     create_formula_table()
 
 
 def downgrade() -> None:
-    op.drop_table('formula')    
-    op.drop_table('rawmaterial')    
-    op.drop_table('product_offered')    
-    op.drop_table('product')
+    op.drop_table('formula')
+    op.drop_table('rawmaterial')
+    op.drop_table('product_offered')
     op.drop_table('price')
+    op.drop_table('product')

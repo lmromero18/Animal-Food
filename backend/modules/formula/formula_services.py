@@ -1,6 +1,10 @@
 from typing import List
 from uuid import UUID
 import uuid
+from modules.raw_material.raw_material_exceptions import RawMaterialExceptions
+from modules.raw_material.raw_material_repositories import RawMaterialRepository
+from modules.product.product_exceptions import ProductExceptions
+from modules.product.product_repositories import ProductRepository
 from modules.warehouse.warehouse_exceptions import WarehouseExceptions
 from modules.warehouse.warehouse_services import WarehouseService
 from shared.utils.record_to_dict import record_to_dict
@@ -34,6 +38,20 @@ class FormulaService:
         new_formula = FormulaToSave(**formula.dict())
         new_formula.created_by = current_user.id
         new_formula.updated_by = uuid.UUID(int=0)
+        
+        product_id_exists = await ProductRepository(self.db).get_product_by_id(id=new_formula.product_id)
+        if not product_id_exists:
+            logger.info("The product does not exist in the database")
+            return ServiceResult(ProductExceptions.ProductNotFoundException())
+        
+        if new_formula.required_quantity <= 0:
+            logger.info("The quantity must be greater than 0")
+            return ServiceResult(FormulaExceptions.LowQuantityException())
+        
+        raw_material_id_exists = await RawMaterialRepository(self.db).get_raw_material_by_id(id=new_formula.raw_material_id)
+        if not raw_material_id_exists:
+            logger.info("The raw material does not exist in the database")
+            return ServiceResult(RawMaterialExceptions.RawMaterialNotFoundException())
 
         formula_item = await FormulaRepository(self.db).create_formula(new_formula)
 
@@ -83,6 +101,20 @@ class FormulaService:
     ) -> ServiceResult:
         if not is_valid_uuid(id):
             return ServiceResult(FormulaExceptions.FormulaIdNoValidException())
+        
+        if formula_update.required_quantity <= 0:
+            logger.info("The quantity must be greater than 0")
+            return ServiceResult(FormulaExceptions.LowQuantityException())
+        
+        product_id_exists = await ProductRepository(self.db).get_product_by_id(id=formula_update.product_id)
+        if not product_id_exists:
+            logger.info("The product does not exist in the database")
+            return ServiceResult(ProductExceptions.ProductNotFoundException())
+        
+        raw_material_id_exists = await RawMaterialRepository(self.db).get_raw_material_by_id(id=formula_update.raw_material_id)
+        if not raw_material_id_exists:
+            logger.info("The raw material does not exist in the database")
+            return ServiceResult(RawMaterialExceptions.RawMaterialNotFoundException())
 
         try:
             formula = await FormulaRepository(self.db).update_formula(

@@ -84,3 +84,13 @@ class ProductOfferedExceptions:
             status_code = 422
             msg = "La cantidad debe ser mayor a 0"
             AppExceptionCase.__init__(self, status_code, msg)
+            
+    class ProductOfferedNameExistsException(AppExceptionCase):
+        """_
+        Product offered name exists
+        """
+
+        def __init__(self, msg: str = ""):
+            status_code = 422
+            msg = "El nombre del producto ofrecido ya existe, actualice el registro en vez de crear uno nuevo"
+            AppExceptionCase.__init__(self, status_code, msg)

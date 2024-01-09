@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from modules.product.product_repositories import ProductRepository
 from modules.product_offered.product_offered_exceptions import ProductOfferedExceptions
 from modules.product_offered.product_offered_repositories import ProductOfferedRepository
 from modules.raw_material.raw_material_repositories import RawMaterialRepository
@@ -104,8 +105,15 @@ class OrderRepository:
         # Compara el descuento anterior con el nuevo descuento
         if previous_discount != order_params_dict["discount"]:
             # Si son diferentes, actualiza el total
-            product_item = await ProductOfferedRepository(self.db).get_product_offered_by_id(id=order_update.product_offered_id)
-            order_params_dict["total"] = (product_item.product.price.price * order_params_dict["quantity"]) - order_params_dict["discount"]
+            product_offered_item = await ProductOfferedRepository(self.db).get_product_offered_by_id(id=order_update.product_offered_id)
+            if product_offered_item:
+                product_id = product_offered_item.product_id
+                product_item = await ProductRepository(self.db).get_product_by_id(id=product_id) 
+                if product_item:
+                    product_price_item = await PriceRepository(self.db).get_price_by_product_id(product_id=product_id)                
+                    if product_price_item:
+                        product_price = product_price_item.price
+                        order_params_dict["total"] = (product_price* order_params_dict["quantity"]) - order_params_dict["discount"]
             
         # Si el pedido se marca como entregado, actualiza la fecha de entrega                 
         if (order_params_dict["is_delivered"] == True):

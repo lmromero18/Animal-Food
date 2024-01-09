@@ -1,11 +1,11 @@
 CREATE_PRICE_ITEM = """
-INSERT INTO price (id, price, is_active, created_at, updated_at, created_by, updated_by)
-VALUES (:id, :price, :is_active, :created_at, :updated_at, :created_by, :updated_by)
-RETURNING id, price, is_active, created_at, updated_at, created_by, updated_by
+INSERT INTO price (id, price, is_active, created_at, updated_at, created_by, updated_by, product_id)
+VALUES (:id, :price, :is_active, :created_at, :updated_at, :created_by, :updated_by, :product_id)
+RETURNING id, price, is_active, created_at, updated_at, created_by, updated_by, product_id;
 """
 
 GET_PRICE_LIST = """
-SELECT p.id, p.price, p.is_active, p.created_at, p.updated_at,
+SELECT p.id, p.price, p.is_active, p.created_at, p.updated_at, product_id,
     CAST(p.created_by AS UUID) AS created_by,
     CAST(p.updated_by AS UUID) AS updated_by,
     us1.fullname AS created_by_name,
@@ -37,7 +37,7 @@ def price_list_complements(order: str | None, direction: str | None):
     return sql_sentence
 
 GET_PRICE_BY_ID = """
-SELECT p.id, p.price, p.is_active, p.created_at, p.updated_at,
+SELECT p.id, p.price, p.is_active, p.created_at, p.updated_at, product_id,
     CAST(p.created_by AS UUID) AS created_by,
     CAST(p.updated_by AS UUID) AS updated_by,
     us1.fullname AS created_by_name,
@@ -55,13 +55,26 @@ SET price = :price,
     created_at = :created_at,
     updated_at = :updated_at,
     created_by = :created_by,
-    updated_by = :updated_by
+    updated_by = :updated_by,
+    product_id = :product_id
 WHERE id = :id
-RETURNING id, price, is_active, created_at, updated_at, created_by, updated_by;
+RETURNING id, price, is_active, created_at, updated_at, created_by, updated_by, product_id;
 """
 
 DELETE_PRICE_BY_ID = """
 DELETE FROM price
 WHERE id = :id
 RETURNING id
+"""
+
+GET_PRICE_BY_PRODUCT_ID = """
+SELECT p.id, p.price, p.is_active, p.created_at, p.updated_at, product_id,
+    CAST(p.created_by AS UUID) AS created_by,
+    CAST(p.updated_by AS UUID) AS updated_by,
+    us1.fullname AS created_by_name,
+    us2.fullname AS updated_by_name
+FROM price AS p
+LEFT JOIN users AS us1 ON us1.id = CAST(p.created_by AS UUID)
+LEFT JOIN users AS us2 ON us2.id = CAST(p.updated_by AS UUID)
+WHERE p.product_id = :product_id
 """

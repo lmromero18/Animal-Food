@@ -1,4 +1,3 @@
-from modules.price.price_repositories import PriceRepository
 from databases import Database
 from loguru import logger
 from typing import List
@@ -6,7 +5,6 @@ from uuid import UUID
 
 from modules.product.product_exceptions import ProductExceptions
 from modules.product.product_schemas import (
-    ProductCreate,
     ProductInDB,
     ProductToSave,
     ProductUpdate
@@ -21,12 +19,6 @@ class ProductRepository:
         
     async def get_complete_product(self, record):
         product = ProductInDB(**dict(record))
-        if (product.price_id):            
-            price = await PriceRepository(self.db).get_price_by_id(product.price_id)
-            if price:
-                product.price = price
-            else:
-                raise ProductExceptions.ProductCreateException()
         return product
     
     async def create_product(self, product: ProductToSave) -> ProductInDB:

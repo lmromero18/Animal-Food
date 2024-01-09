@@ -111,3 +111,21 @@ SELECT CASE
     ELSE 'false'
 END;
 """
+
+GET_PRODUCT_OFFERED_BY_NAME = """
+    SELECT p.id, p.name, p.code, p.quantity, p.is_active, p.created_at, p.updated_at, 
+        CAST(p.created_by AS UUID) AS created_by, 
+        CAST(p.updated_by AS UUID) AS updated_by,
+        us1.fullname AS created_by_name, 
+        us2.fullname AS updated_by_name,
+        w.id AS warehouse_id,
+        w.name AS warehouse_name,
+        pr.id AS product_id,
+        pr.name AS product_offered_name
+    FROM product_offered AS p
+    LEFT JOIN users AS us1 ON us1.id = CAST(p.created_by AS UUID)
+    LEFT JOIN users AS us2 ON us2.id = CAST(p.updated_by AS UUID)
+    LEFT JOIN warehouse AS w ON w.id = p.warehouse_id
+    LEFT JOIN product AS pr ON pr.id = p.product_id
+    WHERE p.name = :name; 
+"""

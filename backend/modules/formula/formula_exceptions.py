@@ -64,3 +64,13 @@ class FormulaExceptions:
             status_code = 422
             msg = "ID del producto inválido para la fórmula"
             AppExceptionCase.__init__(self, status_code, msg)
+            
+    class LowQuantityException(AppExceptionCase):
+        """_
+        Low quantity
+        """
+
+        def __init__(self, msg: str = ""):
+            status_code = 422
+            msg = "Cantidad menor a 0"
+            AppExceptionCase.__init__(self, status_code, msg)

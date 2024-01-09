@@ -1,6 +1,8 @@
 from typing import List
 from uuid import UUID
 import uuid
+from modules.product.product_exceptions import ProductExceptions
+from modules.product.product_repositories import ProductRepository
 from shared.utils.verify_uuid import is_valid_uuid
 
 from databases import Database
@@ -30,7 +32,19 @@ class PriceService:
 
         new_price = PriceToSave(**price.dict())
         new_price.created_by = current_user.id
-        new_price.updated_by = uuid.UUID(int=0)
+        new_price.updated_by = uuid.UUID(int=0)        
+               
+        product_id_exists = await ProductRepository(self.db).get_product_by_id(id=new_price.product_id)
+        
+        if not product_id_exists:
+            logger.info("El producto no existe en base de datos")
+            return ServiceResult(ProductExceptions.ProductNotFoundException())
+        
+        product_id_exists_in_price = await PriceRepository(self.db).get_price_by_product_id(product_id=new_price.product_id)
+        
+        if product_id_exists_in_price:
+            logger.info("El producto ya tiene un precio asignado")
+            return ServiceResult(PriceExceptions.PriceProductExistsException())
         
         if new_price.price <= 0:
             logger.info("El precio debe ser mayor a 0")
@@ -85,9 +99,21 @@ class PriceService:
         if not is_valid_uuid(id):
             return ServiceResult(PriceExceptions.PriceIdNoValidException())
         
+        product_id_exists = await ProductRepository(self.db).get_product_by_id(id=price_update.product_id)
+        
+        if not product_id_exists:
+            logger.info("El producto no existe en base de datos")
+            return ServiceResult(ProductExceptions.ProductNotFoundException())
+        
         if price_update.price <= 0:
             logger.info("El precio debe ser mayor a 0")
             return ServiceResult(PriceExceptions.LowPriceException())
+
+        product_id_exists_in_price = await PriceRepository(self.db).get_price_by_product_id(product_id=price_update.product_id)
+        
+        if product_id_exists_in_price and product_id_exists_in_price.id != id:
+            logger.info("El producto ya tiene un precio asignado")
+            return ServiceResult(PriceExceptions.PriceProductExistsException())
 
         try:
             price = await PriceRepository(self.db).update_price(

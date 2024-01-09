@@ -2,6 +2,10 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 import uuid
+from modules.raw_material.raw_material_exceptions import RawMaterialExceptions
+from modules.supplier.supplier_exceptions import SupplierExceptions
+from modules.raw_material.raw_material_repositories import RawMaterialRepository
+from modules.supplier.supplier_repositories import SupplierRepository
 from shared.utils.record_to_dict import record_to_dict
 from shared.utils.verify_uuid import is_valid_uuid
 
@@ -35,6 +39,16 @@ class PurchaseService:
         new_purchase.order_date = datetime.now()
         new_purchase.created_by = current_user.id
         new_purchase.updated_by = uuid.UUID(int=0)
+        
+        supplier_id_exists = await SupplierRepository(self.db).get_supplier_by_id(id=new_purchase.supplier_id)
+        if not supplier_id_exists:
+            logger.info("The supplier does not exist in the database")
+            return ServiceResult(SupplierExceptions.SupplierNotFoundException())
+        
+        raw_material_id_exists = await RawMaterialRepository(self.db).get_raw_material_by_id(id=new_purchase.raw_material_id)
+        if not raw_material_id_exists:
+            logger.info("The raw material does not exist in the database")
+            return ServiceResult(RawMaterialExceptions.RawMaterialNotFoundException())
 
         purchase_item = await PurchaseRepository(self.db).create_purchase(new_purchase)
 
@@ -84,6 +98,16 @@ class PurchaseService:
     ) -> ServiceResult:
         if not is_valid_uuid(id):
             return ServiceResult(PurchaseExceptions.PurchaseIdNoValidException())
+
+        supplier_id_exists = await SupplierRepository(self.db).get_supplier_by_id(id=purchase_update.supplier_id)
+        if not supplier_id_exists:
+            logger.info("The supplier does not exist in the database")
+            return ServiceResult(SupplierExceptions.SupplierNotFoundException())
+        
+        raw_material_id_exists = await RawMaterialRepository(self.db).get_raw_material_by_id(id=purchase_update.raw_material_id)
+        if not raw_material_id_exists:
+            logger.info("The raw material does not exist in the database")
+            return ServiceResult(RawMaterialExceptions.RawMaterialNotFoundException())
 
         try:
             purchase = await PurchaseRepository(self.db).update_purchase(

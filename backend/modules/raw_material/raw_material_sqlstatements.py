@@ -71,3 +71,18 @@ DELETE FROM rawmaterial
 WHERE id = :id
 RETURNING id
 """
+
+GET_RAW_MATERIAL_BY_CODE = """
+SELECT rm.id, rm.code, rm.name, rm.available_quantity, rm.is_active, rm.created_at, rm.updated_at,
+    CAST(rm.created_by AS UUID) AS created_by,
+    CAST(rm.updated_by AS UUID) AS updated_by,
+    us1.fullname AS created_by_name,
+    us2.fullname AS updated_by_name,
+    w.id AS warehouse_id,
+    w.name AS warehouse_name
+FROM rawmaterial AS rm
+LEFT JOIN users AS us1 ON us1.id = CAST(rm.created_by AS UUID)
+LEFT JOIN users AS us2 ON us2.id = CAST(rm.updated_by AS UUID)
+LEFT JOIN warehouse AS w ON w.id = rm.warehouse_id
+WHERE rm.code = :code
+"""

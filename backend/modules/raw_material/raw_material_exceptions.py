@@ -54,3 +54,23 @@ class RawMaterialExceptions:
             status_code = 422
             msg = "Id de almacén inválido"
             AppExceptionCase.__init__(self, status_code, msg)
+            
+    class RawMaterialCodeExistsException(AppExceptionCase):
+        """_
+        Raw material code exists
+        """
+
+        def __init__(self, msg: str = ""):
+            status_code = 422
+            msg = "El código de materia prima ya existe"
+            AppExceptionCase.__init__(self, status_code, msg)
+            
+    class LowQuantityException(AppExceptionCase):
+        """_
+        Low quantity
+        """
+
+        def __init__(self, msg: str = ""):
+            status_code = 422
+            msg = "La cantidad debe ser mayor a 0"
+            AppExceptionCase.__init__(self, status_code, msg)

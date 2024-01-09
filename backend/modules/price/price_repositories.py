@@ -1,3 +1,4 @@
+from modules.product.product_repositories import ProductRepository
 from modules.warehouse.warehouse_repositories import WarehouseRepository
 from databases import Database
 from loguru import logger
@@ -21,8 +22,14 @@ class PriceRepository:
         
     async def get_complete_price(self, record):
         price = PriceInDB(**dict(record))
-        return price
-
+        if (price.product_id):            
+            product = await ProductRepository(self.db).get_product_by_id(price.product_id)
+            if product:
+                price.product = product
+            else:
+                raise PriceExceptions.PriceCreateException()
+        return price    
+        
     async def create_price(self, price: PriceToSave) -> PriceInDB:
         from modules.price.price_sqlstatements import CREATE_PRICE_ITEM
 
@@ -92,6 +99,9 @@ class PriceRepository:
         price_params_dict["updated_by"] = updated_by_id
         price_params_dict["updated_at"] = ru._preprocess_date()
         
+        if "product" in price_params_dict:
+            del price_params_dict["product"]
+        
         try:
             record = await self.db.fetch_one(query=UPDATE_PRICE_BY_ID, values=price_params_dict)
             price_updated = record_to_dict(record)
@@ -115,3 +125,13 @@ class PriceRepository:
         price_id_delete = dict(record)        
 
         return price_id_delete
+    
+    async def get_price_by_product_id(self, product_id: UUID) -> PriceInDB | dict:
+        from modules.price.price_sqlstatements import GET_PRICE_BY_PRODUCT_ID
+
+        values = {"product_id": product_id}
+        record = await self.db.fetch_one(query=GET_PRICE_BY_PRODUCT_ID, values=values)
+        if not record:
+            return {}
+
+        return await self.get_complete_price(record_to_dict(record))

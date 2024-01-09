@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 import uuid
+from modules.price.price_repositories import PriceRepository
+from modules.product.product_repositories import ProductRepository
 from modules.backlog.backlog_exceptions import BacklogExceptions
 from modules.backlog.backlog_schemas import BacklogToSave
 from modules.backlog.backlog_repositories import BacklogRepository
@@ -39,24 +41,28 @@ class OrderService:
         new_order.order_date = datetime.now()
         new_order.created_by = current_user.id
         new_order.updated_by = uuid.UUID(int=0)        
-               
-        
-        product_item = await ProductOfferedRepository(self.db).get_product_offered_by_id(id=new_order.product_offered_id)
-        if not product_item:
-            logger.info("El producto solicitado no está en base de datos")
-            return ServiceResult(ProductOfferedExceptions.ProductOfferedNotFoundException())
-        else:        
-            product_price = product_item.product.price.price
-            total = (product_price * new_order.quantity) - new_order.discount
+              
+        product_offered_item = await ProductOfferedRepository(self.db).get_product_offered_by_id(id=new_order.product_offered_id)
+        if not product_offered_item:
+                logger.info("El producto solicitado no está en base de datos")
+                return ServiceResult(ProductOfferedExceptions.ProductOfferedNotFoundException())
+        else:
+            product_id = product_offered_item.product_id
+            product_item = await ProductRepository(self.db).get_product_by_id(id=product_id) 
+            if product_item:
+                product_price_item = await PriceRepository(self.db).get_price_by_product_id(product_id=product_id)                
+                if product_price_item:
+                    product_price = product_price_item.price
+                    total = (product_price * new_order.quantity) - new_order.discount
         
         if (new_order.quantity <= 0):
             logger.info("La cantidad debe ser mayor a 0")
             return ServiceResult(OrderExceptions.OrderQuantityException())
         
-        if (product_item and (new_order.quantity > product_item.quantity)):
+        if (product_offered_item and (new_order.quantity > product_offered_item.quantity)):
             backlog = BacklogToSave(
-                product_id=product_item.product_id,
-                required_quantity=new_order.quantity - product_item.quantity,
+                product_id=product_offered_item.product_id,
+                required_quantity=new_order.quantity - product_offered_item.quantity,
                 created_by=current_user.id,
                 updated_by=uuid.UUID(int=0)
             )
@@ -66,7 +72,7 @@ class OrderService:
                 return ServiceResult(BacklogExceptions.BacklogCreateException())
             
             logger.info("La cantidad solicitada no está disponible")
-            return ServiceResult(OrderExceptions.OrderQuantityNotAvailableException(product_item.quantity, new_order.quantity))
+            return ServiceResult(OrderExceptions.OrderQuantityNotAvailableException(product_offered_item.quantity, new_order.quantity))
         
         if (product_price * new_order.quantity < new_order.discount):
             logger.info("El descuento no puede ser mayor al total")
@@ -124,21 +130,25 @@ class OrderService:
         if not is_valid_uuid(id):
             return ServiceResult(OrderExceptions.OrderIdNoValidException())
 
-        product_item = await ProductOfferedRepository(self.db).get_product_offered_by_id(id=order_update.product_offered_id)
-        
-        if not product_item:
-            logger.info("El producto solicitado no está en base de datos")
-            return ServiceResult(ProductOfferedExceptions.ProductOfferedNotFoundException())
+        product_offered_item = await ProductOfferedRepository(self.db).get_product_offered_by_id(id=order_update.product_offered_id)
+        if not product_offered_item:
+                logger.info("El producto solicitado no está en base de datos")
+                return ServiceResult(ProductOfferedExceptions.ProductOfferedNotFoundException())
         else:
-            product_price = product_item.product.price.price
+            product_id = product_offered_item.product_id
+            product_item = await ProductRepository(self.db).get_product_by_id(id=product_id) 
+            if product_item:
+                product_price_item = await PriceRepository(self.db).get_price_by_product_id(product_id=product_id)                
+                if product_price_item:
+                    product_price = product_price_item.price
         
         if (order_update.quantity <= 0):
             logger.info("La cantidad debe ser mayor a 0")
             return ServiceResult(OrderExceptions.OrderQuantityException())
         
-        if (product_item and (order_update.quantity > product_item.quantity)):
+        if (product_offered_item and (order_update.quantity > product_offered_item.quantity)):
             logger.info("La cantidad solicitada no está disponible")
-            return ServiceResult(OrderExceptions.OrderQuantityNotAvailableException(product_item.quantity, order_update.quantity))
+            return ServiceResult(OrderExceptions.OrderQuantityNotAvailableException(product_offered_item.quantity, order_update.quantity))
        
         if (product_price * order_update.quantity < order_update.discount):
             logger.info("El descuento no puede ser mayor al total")

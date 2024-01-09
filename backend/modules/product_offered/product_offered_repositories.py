@@ -146,3 +146,13 @@ class ProductOfferedRepository:
         product_offered_id_delete = dict(record)        
 
         return product_offered_id_delete
+    
+    async def get_product_offered_by_name(self, name: str) -> ProductOfferedInDB | dict:
+        from modules.product_offered.product_offered_sqlstatements import GET_PRODUCT_OFFERED_BY_NAME
+
+        values = {"name": name}
+        record = await self.db.fetch_one(query=GET_PRODUCT_OFFERED_BY_NAME, values=values)
+        if not record:
+            return {}
+
+        return await self.get_complete_product_offered(record_to_dict(record))

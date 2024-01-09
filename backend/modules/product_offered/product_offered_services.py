@@ -53,6 +53,7 @@ class ProductOfferedService:
         new_product_offered.created_by = current_user.id
         new_product_offered.updated_by = uuid.UUID(int=0)
         
+               
         if new_product_offered.quantity <= 0:
             logger.info("La cantidad debe ser mayor a 0")
             return ServiceResult(ProductOfferedExceptions.ProductOfferedQuantityException())
@@ -66,6 +67,13 @@ class ProductOfferedService:
         if not product_item:
             logger.info("El producto solicitado no está en base de datos")
             return ServiceResult(ProductExceptions.ProductNotFoundException())
+        
+        if product_item:   
+            product_name_exists = await ProductOfferedRepository(self.db).get_product_offered_by_name(name=product_item.name)
+        
+            if product_name_exists:
+                logger.info("El producto ya existe en base de datos")
+                return ServiceResult(ProductOfferedExceptions.ProductOfferedNameExistsException())
         
         new_product_offered.name = product_item.name
 
@@ -128,10 +136,6 @@ class ProductOfferedService:
     ) -> ServiceResult:
         if not is_valid_uuid(id):
             return ServiceResult(ProductOfferedExceptions.ProductOfferedIdNoValidException())
-
-        if product_offered_update.quantity <= 0:
-            logger.info("La cantidad debe ser mayor a 0")
-            return ServiceResult(ProductOfferedExceptions.ProductOfferedQuantityException())
         
         warehouse_item = await WarehouseRepository(self.db).get_warehouse_by_id(id=product_offered_update.warehouse_id)
         if not warehouse_item:

@@ -125,3 +125,13 @@ class RawMaterialRepository:
         raw_material_id_delete = dict(record)        
 
         return raw_material_id_delete
+    
+    async def get_raw_material_by_code(self, code: str) -> RawMaterialInDB | dict:
+        from modules.raw_material.raw_material_sqlstatements import GET_RAW_MATERIAL_BY_CODE
+
+        values = {"code": code}
+        record = await self.db.fetch_one(query=GET_RAW_MATERIAL_BY_CODE, values=values)
+        if not record:
+            return {}
+
+        return await self.get_complete_raw_material(record_to_dict(record))

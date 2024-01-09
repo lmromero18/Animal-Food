@@ -1,6 +1,8 @@
 from typing import List
 from uuid import UUID
 import uuid
+from modules.warehouse.warehouse_exceptions import WarehouseExceptions
+from modules.warehouse.warehouse_repositories import WarehouseRepository
 from shared.utils.record_to_dict import record_to_dict
 from shared.utils.verify_uuid import is_valid_uuid
 
@@ -32,6 +34,22 @@ class RawMaterialService:
         new_raw_material = RawMaterialToSave(**raw_material.dict())
         new_raw_material.created_by = current_user.id
         new_raw_material.updated_by = uuid.UUID(int=0)
+        
+        if new_raw_material.quantity <= 0:
+            logger.info("The quantity must be greater than 0")
+            return ServiceResult(RawMaterialExceptions.LowQuantityException())
+        
+        code_exists = await RawMaterialRepository(self.db).get_raw_material_by_code(code=new_raw_material.code)
+        
+        if code_exists:
+            logger.info("The raw material code already exists in the database")
+            return ServiceResult(RawMaterialExceptions.RawMaterialCodeExistsException())
+        
+        warehouse_exists = await WarehouseRepository(self.db).get_warehouse_by_id(id=new_raw_material.warehouse_id)
+        
+        if not warehouse_exists:
+            logger.info("The warehouse does not exist in the database")
+            return ServiceResult(WarehouseExceptions.WarehouseNotFoundException())
 
         raw_material_item = await RawMaterialRepository(self.db).create_raw_material(new_raw_material)
 
@@ -81,6 +99,18 @@ class RawMaterialService:
     ) -> ServiceResult:
         if not is_valid_uuid(id):
             return ServiceResult(RawMaterialExceptions.RawMaterialIdNoValidException())
+        
+        code_exists = await RawMaterialRepository(self.db).get_raw_material_by_code(code=raw_material_update.code)
+        
+        if code_exists:
+            logger.info("The raw material code already exists in the database")
+            return ServiceResult(RawMaterialExceptions.RawMaterialCodeExistsException())
+
+        warehouse_exists = await WarehouseRepository(self.db).get_warehouse_by_id(id=raw_material_update.warehouse_id)
+        
+        if not warehouse_exists:
+            logger.info("The warehouse does not exist in the database")
+            return ServiceResult(WarehouseExceptions.WarehouseNotFoundException())
 
         try:
             raw_material = await RawMaterialRepository(self.db).update_raw_material(

@@ -53,12 +53,11 @@ class TestSupplierUpdateRoutes:
 class TestSupplierUpdateById:
     async def test_supplier_update_by_id_route(self, authorized_client: AsyncClient, app:FastAPI) -> None:
         client = await authorized_client
-        supplier = await client.post(app.url_path_for("supplier:create-supplier"), json={"supplier": {"name": "SupplierName234","address": "string"}})
         supplier_list_response = await client.get(app.url_path_for("supplier:supplier_list"))
         supplier_list = supplier_list_response.json().get("data")[0]
         supplier_id = supplier_list.get("id")
-        res = await client.put(app.url_path_for("supplier:update-supplier-by-id", id=supplier_id), json={"supplier": {"name": "SupplierName24","address": "string"}})
-        assert res.status_code != status.HTTP_200_OK
+        res = await client.put(app.url_path_for("supplier:update-supplier-by-id", id=supplier_id), json={"supplier_update": {"name": "SupplierName24","address": "string", "is_active": True}})
+        assert res.status_code == status.HTTP_200_OK
         
 class TestSupplierDeleteRoutes:
     async def test_supplier_delete_route_exists(self, app: FastAPI, client:AsyncClient) -> None:

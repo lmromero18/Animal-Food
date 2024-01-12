@@ -157,17 +157,15 @@ class TestPurchaseUpdateById:
         purchase_id = purchase_list.get("id")
         
         supplier_update_json = {
-            
-            "supplier_update": {
-                "name": "string",
-                "address": "string",
-                "is_active": True
+            "purchase_update": {
+                "supplier_id": supplier_id,
+                "raw_material_id": raw_material_id,
+                "quantity": 2,
+                "is_delivered": True
             }
-            
         }
-        
         res = await client.put(app.url_path_for("purchase:update-purchase-by-id", id=purchase_id), json=supplier_update_json)
-        assert res.status_code != status.HTTP_200_OK
+        assert res.status_code == status.HTTP_200_OK
         
 class TestPurchaseDeleteRoutes:
     async def test_price_delete_route_exists(self, app: FastAPI, client:AsyncClient) -> None:

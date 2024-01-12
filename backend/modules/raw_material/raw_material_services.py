@@ -102,7 +102,7 @@ class RawMaterialService:
         
         code_exists = await RawMaterialRepository(self.db).get_raw_material_by_code(code=raw_material_update.code)
         
-        if code_exists:
+        if code_exists and code_exists.id != id:
             logger.info("The raw material code already exists in the database")
             return ServiceResult(RawMaterialExceptions.RawMaterialCodeExistsException())
 

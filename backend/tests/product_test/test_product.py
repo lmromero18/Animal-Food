@@ -52,12 +52,11 @@ class TestProductUpdateRoutes:
 class TestProductUpdateById:
     async def test_product_update_by_id_route(self, authorized_client: AsyncClient, app:FastAPI) -> None:
         client = await authorized_client
-        product = await client.post(app.url_path_for("product:create-product"), json={"product": {"name": "ProductName65558","description": "string"}})
         product_list_response = await client.get(app.url_path_for("product:product_list"))
         product_list = product_list_response.json().get("data")[0]
         product_id = product_list.get("id")
-        res = await client.put(app.url_path_for("product:update-product-by-id", id=product_id), json={"product": {"name": "ProductName","description": "string"}})
-        assert res.status_code != status.HTTP_200_OK
+        res = await client.put(app.url_path_for("product:update-product-by-id", id=product_id), json={"product_update": {"name": "ProductName","description": "string", "is_active": True}})
+        assert res.status_code == status.HTTP_200_OK
         
 class TestProductDeleteRoutes:
     async def test_product_delete_route_exists(self, app: FastAPI, client:AsyncClient) -> None:

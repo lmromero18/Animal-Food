@@ -66,18 +66,17 @@ class TestRawMaterialUpdateById:
         
         #Create a warehouse
         warehouse = await client.post(app.url_path_for("warehouse:create-warehouse"), json={"warehouse": {"type": "test"}})
+        assert warehouse.status_code == status.HTTP_201_CREATED
         warehouse_list_response = await client.get(app.url_path_for("warehouse:warehouse_list"))
         warehouse_list = warehouse_list_response.json().get("data")[0]
         warehouse_id = warehouse_list.get("id")        
         
         #Create a raw material
-        raw_material = await client.post(app.url_path_for("raw_material:create-raw-material"), json={"raw_material": {"name": "string2","code": "string2","available_quantity": 20,"warehouse_id": warehouse_id}})
         raw_material_list_response = await client.get(app.url_path_for("raw_material:raw_material_list"))
+        assert raw_material_list_response.status_code == status.HTTP_200_OK
         raw_material_list = raw_material_list_response.json().get("data")[0]
-        raw_material_id = raw_material_list.get("id")
-        
-        raw_material = await client.get(app.url_path_for("raw_material:get-raw-material-by-id", id=raw_material_id))
-        
+        raw_material_id = raw_material_list.get("id")        
+       
         # Update the raw material
         raw_material_update = {
         "raw_material_update": {
@@ -89,7 +88,7 @@ class TestRawMaterialUpdateById:
         }
         }
         res = await client.put(app.url_path_for("raw_material:update-raw-material-by-id", id=raw_material_id), json=raw_material_update)
-        assert res.status_code != status.HTTP_200_OK
+        assert res.status_code == status.HTTP_200_OK
         
 class TestRawMaterialDeleteRoutes:
     async def test_raw_material_delete_route_exists(self, app: FastAPI, client:AsyncClient) -> None:
